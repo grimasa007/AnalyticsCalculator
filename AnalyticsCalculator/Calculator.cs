@@ -15,8 +15,8 @@ namespace AnalyticsCalculator
 
         private List<Trade> _mockTrades = new List<Trade>()
         {
-            new Trade(){ Profit = 100, MarketPosition = "Short", EntryDate = new DateTime(2018, 01, 12)},
-            new Trade(){ Profit = 150, MarketPosition = "Long"},
+            new Trade(){ Profit = -100, MarketPosition = "Short", EntryDate = new DateTime(2018, 01, 12)},
+            new Trade(){ Profit = -150, MarketPosition = "Long"},
             new Trade(){ Profit = -30, MarketPosition = "Long", EntryDate = new DateTime(2019, 01, 01)},
             new Trade(){ Profit = -50, MarketPosition = "Short"},
             new Trade(){ Profit = -200, MarketPosition = "Long"},
@@ -218,7 +218,22 @@ namespace AnalyticsCalculator
                     {
                         _maxDDBelowZero = _mockTrades[i].CumProfit;
                     }
-                        
+
+                    if (lastEquityHigh == 0)
+                    {
+                        var dd = new DrawDown()
+                        {
+                            StartDate = _mockTrades[i].EntryDate,
+                            Values = new List<double>()
+                            {
+                                _mockTrades[i].CurrentDrawDown
+                            }
+
+                        };
+
+                        _drawDowns.Add(dd);
+                    }
+
                 }
                 if (i > 0)
                 {
@@ -245,6 +260,8 @@ namespace AnalyticsCalculator
                         _mockTrades[i].CurrentDrawDown = 0;
 
                         
+
+
                     }
                     else if (_mockTrades[i].CumProfit < lastEquityHigh)
                     {
@@ -252,7 +269,7 @@ namespace AnalyticsCalculator
                         _mockTrades[i].CurrentDrawDown = _mockTrades[i].CumProfit - lastEquityHigh;
 
                         //draw down started
-                        if (_mockTrades[i - 1].CumProfit >= lastEquityHigh)
+                        if (_mockTrades[i - 1].CumProfit > lastEquityHigh)
                         {
                             var dd = new DrawDown()
                             {
