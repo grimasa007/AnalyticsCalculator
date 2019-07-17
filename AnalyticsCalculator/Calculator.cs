@@ -197,6 +197,7 @@ namespace AnalyticsCalculator
             _drawDowns = new List<DrawDown>();
             double currentDD = 0;
             double lastEquityHigh = 0;
+            
 
             for (int i = 0; i < _mockTrades.Count; i++)
             {
@@ -206,12 +207,15 @@ namespace AnalyticsCalculator
                     _mockTrades[i].CumProfit = _mockTrades[i].Profit;
 
                     if (_mockTrades[i].Profit > 0)
+                    {
                         lastEquityHigh = _mockTrades[i].CumProfit;
-
+                        _mockTrades[i].CurrentDaysNoEquiteHigh = 0;
+                    }
                     else if (_mockTrades[i].Profit < 0)
                     {
                         lastEquityHigh = 0;
                         _mockTrades[i].CurrentDrawDown = _mockTrades[i].Profit;
+                        _mockTrades[i].CurrentDaysNoEquiteHigh = (_mockTrades[i].ExitDate - _mockTrades[i].EntryDate).TotalDays;
                     }
 
                     if (_mockTrades[i].CumProfit < _maxDDBelowZero)
@@ -241,6 +245,8 @@ namespace AnalyticsCalculator
 
                     if (_mockTrades[i].CumProfit > lastEquityHigh)
                     {
+                        _mockTrades[i].CurrentDaysNoEquiteHigh = 0;
+
                         //add draw down period end date and calculate period Max Draw Down
                         if (_mockTrades[i - 1].CumProfit < lastEquityHigh)
                         {
@@ -288,6 +294,10 @@ namespace AnalyticsCalculator
                             //adding current draw down values to draw down object list of values
                             _drawDowns[_drawDowns.Count-1].Values.Add(_mockTrades[i].CurrentDrawDown);
                         }
+
+                        //calculate current draw down length in days on current trade
+                        _mockTrades[i].CurrentDaysNoEquiteHigh =
+                            (_mockTrades[i].ExitDate - _drawDowns[_drawDowns.Count - 1].StartDate).TotalDays;
 
                         //evaluating maximum draw down and max draw down date
                         if (_mockTrades[i].CurrentDrawDown < MaxDrawDown)

@@ -18,6 +18,7 @@ namespace AnalyticsCalculator
 
         public double CumProfit { get; set; }
         public double CurrentDrawDown { get; set; } 
+        public double CurrentDaysNoEquiteHigh { get; set; }
 
     }
 }
